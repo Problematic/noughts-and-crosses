@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class GameController : MonoBehaviour {
-	public Player currentPlayer = Player.X;
-	public Player winner;
 	public Board board;
-	int claimedSquares = 0;
+	public GameState state;
 
 	public PlayerEvent onVictory;
 
@@ -23,31 +21,26 @@ public class GameController : MonoBehaviour {
 	};
 
 	public void HandleSquareClick (Square square) {
-		if (winner != Player.None) {
+		if (state.winner != Player.None) {
 			return;
 		}
 
 		if (square.IsUnclaimed) {
-			square.Owner = currentPlayer;
-			currentPlayer = currentPlayer == Player.X ? Player.O : Player.X;
+			square.Owner = state.currentPlayer;
+			state.claimedSquares++;
 
-			winner = DetermineWinner();
-			claimedSquares++;
+			state.NextPlayer();
+			state.winner = DetermineWinner();
 
-			if (claimedSquares == 9 || winner != Player.None) {
-				onVictory.Invoke(winner);
+			if (state.claimedSquares == 9 || state.winner != Player.None) {
+				onVictory.Invoke(state.winner);
 			}
 		}
 	}
 
 	public void OnResetRequested () {
-		currentPlayer = Player.X;
-		winner = Player.None;
-		claimedSquares = 0;
-
-		for (int i = 0; i < 9; i++) {
-			board[i].Owner = Player.None;
-		}
+		state.Reset();
+		board.Reset();
 	}
 
 	Player DetermineWinner () {

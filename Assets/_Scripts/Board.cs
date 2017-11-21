@@ -40,6 +40,12 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	public void Reset () {
+		foreach (var square in squares) {
+			square.Owner = Player.None;
+		}
+	}
+
 	void HandleSquareClick(Square square) {
 		Debug.Log(square, this);
 	}
