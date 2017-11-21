@@ -43,6 +43,7 @@ public class GameController : MonoBehaviour {
 	public void OnResetRequested () {
 		currentPlayer = Player.X;
 		winner = Player.None;
+		claimedSquares = 0;
 
 		for (int i = 0; i < 9; i++) {
 			board[i].Owner = Player.None;
