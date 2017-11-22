@@ -2,12 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using TinyMessenger;
 
 public class GameController : MonoBehaviour {
 	public Board board;
 	public GameState state;
 
-	public PlayerEvent onVictory;
+	static TinyMessengerHub messageHub;
+	public static TinyMessengerHub MessageHub {
+		get {
+			if (messageHub == null) {
+				messageHub = new TinyMessengerHub();
+			}
+
+			return messageHub;
+		}
+	}
+
+	TinyMessageSubscriptionToken resetToken;
+
+	void OnEnable () {
+		resetToken = MessageHub.Subscribe<ResetMessage>(OnResetRequested);
+	}
+
+	void OnDisable () {
+		MessageHub.Unsubscribe(resetToken);
+	}
 
 	readonly int[][] victoryChecks = new int[][] {
 		new int[] { 0, 1, 2 },
@@ -33,12 +53,12 @@ public class GameController : MonoBehaviour {
 			state.winner = DetermineWinner();
 
 			if (state.claimedSquares == 9 || state.winner != Player.None) {
-				onVictory.Invoke(state.winner);
+				MessageHub.Publish(new GameOverMessage(this, state.winner));
 			}
 		}
 	}
 
-	public void OnResetRequested () {
+	public void OnResetRequested (ResetMessage message) {
 		state.Reset();
 		board.Reset();
 	}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using TinyMessenger;
 
 public enum Player {
 	None,
@@ -29,5 +30,17 @@ public class GameState {
 [System.Serializable]
 public class SquareEvent : UnityEvent<Square> {}
 
-[System.Serializable]
-public class PlayerEvent : UnityEvent<Player> {}
+public class GameOverMessage : ITinyMessage {
+    public object Sender { get; set; }
+	public Player Winner { get; private set; }
+
+	public GameOverMessage (object sender, Player winner) {
+		Sender = sender;
+		Winner = winner;
+	}
+}
+
+public class ResetMessage : TinyMessageBase
+{
+    public ResetMessage(object sender) : base(sender) {}
+}

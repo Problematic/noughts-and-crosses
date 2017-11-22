@@ -8,15 +8,17 @@ public class VictoryToast : MonoBehaviour {
 	public Animator animator;
 	public Text content;
 
-	public UnityEvent onReset;
+	void OnEnable () {
+		GameController.MessageHub.Subscribe<GameOverMessage>(Toast);
+	}
 
-	public void Toast (Player winner) {
-		content.text = winner == Player.None ? "Draw!" : string.Format("{0} wins!", winner);
+	public void Toast (GameOverMessage message) {
+		content.text = message.Winner == Player.None ? "Draw!" : string.Format("{0} wins!", message.Winner);
 		animator.SetTrigger("doToast");
 	}
 
 	public void Reset () {
 		animator.SetTrigger("doReset");
-		onReset.Invoke();
+		GameController.MessageHub.Publish(new ResetMessage(this));
 	}
 }
